@@ -1,6 +1,7 @@
-# react-starter-ts
+# tiny-write-editor-react
 
-> quickstart boilerplate for react using typescript/webpack/babel
+> rewrite [dennis84/tiny-write_v20220823](https://github.com/dennis84/tiny-write) editor with react
+> 76ddfd3992fbdd8f401dee5509d544c40d35b49f
 
 ## features
 

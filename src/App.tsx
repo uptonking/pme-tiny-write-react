@@ -2,14 +2,13 @@ import './index.scss';
 
 import * as React from 'react';
 
-import { Card } from './components';
+import { MainApp } from './common/Main';
 
 export const App = () => {
   return (
     <div>
-      <input type='' />
       <h1>Hello, 世界 202208 </h1>
-      <Card size={16} />
+      <MainApp state={{}} />
     </div>
   );
 };
