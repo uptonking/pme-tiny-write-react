@@ -1,0 +1,19 @@
+# ignore files for prettier
+
+node_modules/
+
+*.md
+
+# docs/
+# dist/
+# build/
+
+
+LICENSE.txt
+*.md
+*.mdx
+
+*.min.js
+*.min.css
+*.js.map
+*.css.map
