@@ -1,7 +1,7 @@
 // import { createContext, useContext } from 'solid-js';
 // import { Store } from 'solid-js/store';
-// import * as Y from 'yjs';
-// import { WebsocketProvider } from 'y-websocket';
+import { WebsocketProvider } from 'y-websocket';
+import * as Y from 'yjs';
 
 export interface Args {
   cwd?: string;
@@ -35,12 +35,9 @@ export interface ErrorObject {
 }
 
 export interface YOptions {
-  // prosemirrorType: Y.XmlFragment;
-  prosemirrorType: any;
-  // configType: Y.Map<any>;
-  configType: any;
-  // provider: WebsocketProvider;
-  provider: any;
+  prosemirrorType: Y.XmlFragment;
+  configType: Y.Map<any>;
+  provider: WebsocketProvider;
 }
 
 export interface Collab {
@@ -83,12 +80,11 @@ export class ServiceError extends Error {
   }
 }
 
-export const StateContext = createContext<[Store<State>, any]>([
-  undefined,
-  undefined,
-]);
-
-export const useState = () => useContext(StateContext);
+// export const StateContext = createContext<[Store<State>, any]>([
+//   undefined,
+//   undefined,
+// ]);
+// export const useState = () => useContext(StateContext);
 
 export const newState = (props: Partial<State> = {}): State => ({
   files: [],

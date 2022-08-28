@@ -1,5 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { createContext, useContextSelector } from 'use-context-selector';
+import {
+  createContext as createContextWithSelector,
+  useContextSelector,
+} from 'use-context-selector';
 
 type DispatchType<ActionType, DispatchReturn> = (
   action: ActionType,
@@ -17,17 +20,19 @@ export const createProvider = <
     props: ProviderProps,
   ) => [state: StateType, dispatch: DispatchType<ActionType, DispatchReturn>],
 ) => {
-  const StateContext = createContext<StateType>(null as any);
+  const StateContext = createContextWithSelector<StateType>(null as any);
   const DispatchContext = React.createContext<
     DispatchType<ActionType, DispatchReturn>
   >(null as any);
 
-  const Provider: React.FC<ProviderProps> = ({ children, ...props }) => {
+  const Provider = ({
+    children,
+    ...props
+  }: ProviderProps & { children: React.ReactNode }) => {
     const [state, _dispatch] = controller(props as any);
     const dispatchRef = useRef(_dispatch);
 
     dispatchRef.current = _dispatch;
-
     // stable dispatch function
     const dispatch = useCallback(
       (action: ActionType) => dispatchRef.current?.(action),
@@ -43,12 +48,12 @@ export const createProvider = <
     );
   };
 
-  const useDispatch = () => React.useContext(DispatchContext);
   const useStateContext = function <SelectorReturn>(
     selector: SelectorType<StateType, SelectorReturn>,
   ) {
     return useContextSelector(StateContext, selector);
   };
+  const useDispatch = () => React.useContext(DispatchContext);
 
-  return [Provider, useDispatch, useStateContext] as const;
+  return [Provider, useStateContext, useDispatch] as const;
 };

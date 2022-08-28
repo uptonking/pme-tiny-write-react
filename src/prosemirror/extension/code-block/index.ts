@@ -23,7 +23,7 @@ export const cleanLang = (lang: string) =>
 
 const codeBlockRule = (nodeType: NodeType) =>
   textblockTypeInputRule(
-    /^```([a-zA-Z]*)?\s$/,
+    /^```([a-z]*)?\s$/,
     nodeType,
     match => {
       const lang = match[1]
@@ -104,11 +104,6 @@ const codeBlockSchema = {
   selectable: true,
   marks: '',
   attrs: {params: {default: ''}},
-  parseDOM: [{
-    tag: 'pre',
-    preserveWhitespace: 'full',
-    getAttrs: (node: Element) => ({params: node.getAttribute('data-params') || ''})
-  }],
   toDOM: (node: Node) => [
     'pre',
     node.attrs.params ? {'data-params': node.attrs.params} : {},

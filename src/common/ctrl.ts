@@ -5,7 +5,7 @@ import { redo, undo } from 'prosemirror-history';
 import { Schema } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
 import { EditorView, NodeViewConstructor } from 'prosemirror-view';
-import { Store, createStore, unwrap } from 'solid-js/store';
+import { useState } from 'react';
 import { debounce } from 'ts-debounce';
 import {
   adjectives,
@@ -26,8 +26,10 @@ import { isDarkTheme, themes } from './config';
 import { COLLAB_URL, isTauri, mod } from './env';
 import { createMarkdownParser, serialize } from './markdown';
 import { createEmptyText, createExtensions, createSchema } from './prosemirror';
-import * as remote from './remote';
 import { Collab, Config, File, ServiceError, State, newState } from './state';
+
+// import * as remote from './remote';
+// import { Store, createStore, unwrap } from 'solid-js/store';
 
 const isText = (x: any) => x && x.doc && x.selection;
 
@@ -41,8 +43,11 @@ const isConfig = (x: any): boolean =>
   (typeof x.codeTheme === 'string' || x.codeTheme === undefined) &&
   (typeof x.font === 'string' || x.font === undefined);
 
-export const createCtrl = (initial: State): [Store<State>, any] => {
-  const [store, setState] = createStore(initial);
+/** 创建并返回全局状态、初始化编辑器、返回操作编辑器的方法 */
+// export const createCtrl = (initial: State): [Store<State>, any] => {
+export const useCreateCtrlEditor = (initial: State) => {
+  // 会返回这个store
+  const [store, setState] = useState(initial);
   const initialEditorState = { text: undefined, extensions: undefined };
 
   const onReload = () => {
@@ -52,7 +57,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
 
   const onQuit = () => {
     if (!isTauri) return;
-    remote.quit();
+    // remote.quit();
   };
 
   const onNew = () => {
@@ -127,7 +132,8 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   };
 
   const discardText = async () => {
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     const index = state.files.length - 1;
     let file = index !== -1 ? state.files[index] : { text: createEmptyText() };
     const files = state.files.filter((f: File) => f !== file);
@@ -161,14 +167,18 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   const fetchData = async (): Promise<
     [State, ProseMirrorState, Uint8Array]
   > => {
-    let args = await remote.getArgs().catch(() => undefined);
-    const state: State = unwrap(store);
+    // let args = await remote.getArgs().catch(() => undefined);
+    let args;
+    // const state: State = unwrap(store);
+    const state: State = store;
 
     if (!isTauri) {
       const room = window.location.pathname?.slice(1).trim();
       args = { room: room ? room : undefined };
     }
     const data = await db.get('state');
+    console.log(';; 读取数据 ', data);
+
     let parsed: any;
     if (data !== undefined) {
       try {
@@ -242,7 +252,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   };
 
   const clean = () => {
-    disconnectCollab(unwrap(store.collab));
+    // disconnectCollab(unwrap(store.collab));
     const state: State = {
       ...newState(),
       args: { cwd: store.args?.cwd },
@@ -275,9 +285,10 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   const setError = (error: Error) => {
     console.error(error);
     if (error instanceof ServiceError) {
-      setState({ error: error.errorObject, loading: 'initialized' });
+      setState({ ...store, error: error.errorObject, loading: 'initialized' });
     } else {
       setState({
+        ...store,
         error: { id: 'exception', props: { error } },
         loading: 'initialized',
       });
@@ -305,14 +316,15 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
       }
 
       const newState: State = {
-        ...unwrap(store),
+        // ...unwrap(store),
+        ...store,
         ...data,
         config: { ...data.config, ...getTheme(data) },
         loading: 'initialized',
       };
 
       if (isTauri && newState.config?.alwaysOnTop) {
-        remote.setAlwaysOnTop(true);
+        // remote.setAlwaysOnTop(true);
       }
 
       updateEditorState(newState, text ?? createEmptyText());
@@ -324,8 +336,10 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
 
   const loadFile = async (config: Config, path: string): Promise<File> => {
     try {
-      const fileContent = await remote.readFile(path);
-      const lastModified = await remote.getFileLastModified(path);
+      // const fileContent = await remote.readFile(path);
+      const fileContent = 'test markdown 内容';
+      // const lastModified = await remote.getFileLastModified(path);
+      const lastModified = new Date();
       const schema = createSchema({
         config,
         markdown: false,
@@ -356,7 +370,8 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
 
   const newFile = () => {
     const empty = isEmpty(store.editorView?.state);
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     let files = state.files;
     if (!state.error && !empty && !store.path) {
       files = addToFiles(files, state);
@@ -378,7 +393,8 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   };
 
   const openFile = async (file: File) => {
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     const update = await doOpenFile(state, file);
     setState(update);
   };
@@ -445,7 +461,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
 
     if (state.path) {
       const text = serialize(store.editorView.state);
-      await remote.writeFile(state.path, text);
+      // await remote.writeFile(state.path, text);
     } else if (state.collab?.room) {
       const documentState = Y.encodeStateAsUpdate(state.collab.y.provider.doc);
       data.ydoc = fromUint8Array(documentState);
@@ -457,13 +473,13 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   }, 200);
 
   const setAlwaysOnTop = (alwaysOnTop: boolean) => {
-    remote.setAlwaysOnTop(alwaysOnTop);
-    setState('config', { alwaysOnTop });
+    // remote.setAlwaysOnTop(alwaysOnTop);
+    // setState('config', { alwaysOnTop });
   };
 
   const setFullscreen = (fullscreen: boolean) => {
-    remote.setFullscreen(fullscreen);
-    setState({ fullscreen });
+    // remote.setFullscreen(fullscreen);
+    // setState({ fullscreen });
   };
 
   const shouldBackup = (state: State, ydoc?: Uint8Array) => {
@@ -476,7 +492,8 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   };
 
   const startCollab = () => {
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     const update = doStartCollab(state, uuidv4());
     updateEditorState(update);
     setState(update);
@@ -486,7 +503,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
     const font = event.target.get('font') as string;
     const fontSize = event.target.get('fontSize') as number;
     const contentWidth = event.target.get('contentWidth') as number;
-    setState('config', { font, fontSize, contentWidth });
+    // setState('config', { font, fontSize, contentWidth });
   };
 
   const doStartCollab = (
@@ -566,7 +583,8 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
   };
 
   const toggleMarkdown = () => {
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     const editorState = store.editorView.state;
     const markdown = !state.markdown;
     const selection = { type: 'text', anchor: 1, head: 1 };
@@ -600,11 +618,12 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
     }
 
     updateEditorState({ ...state, markdown }, { selection, doc });
-    setState({ markdown });
+    setState({ ...store, markdown });
   };
 
   const updateConfig = (conf: Partial<Config>) => {
-    const state: State = unwrap(store);
+    // const state: State = unwrap(store);
+    const state: State = store;
     if (conf.font) state.collab?.y?.configType.set('font', conf.font);
     if (conf.fontSize)
       state.collab?.y?.configType.set('fontSize', conf.fontSize);
@@ -612,17 +631,18 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
       state.collab?.y?.configType.set('contentWidth', conf.contentWidth);
     const config = { ...state.config, ...conf };
     updateEditorState({ ...state, config });
-    setState({ config, lastModified: new Date() });
+    // setState({ config, lastModified: new Date() });
   };
 
   const updatePath = (path: string) => {
-    setState({ path, lastModified: new Date() });
+    // setState({ path, lastModified: new Date() });
   };
 
   const updateTheme = () => {
-    setState('config', getTheme(unwrap(store), true));
+    // setState('config', getTheme(unwrap(store), true));
   };
 
+  /** 创建pme-EditorView对象 */
   const createEditorView = (elem: HTMLElement) => {
     const { text, extensions } = initialEditorState;
     const { editorState, nodeViews } = createEditorState(text, extensions);
@@ -631,7 +651,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
       const newState = store.editorView.state.apply(tr);
       store.editorView.updateState(newState);
       if (!tr.docChanged) return;
-      setState({ lastModified: new Date() });
+      setState({ ...store, lastModified: new Date() });
     };
 
     const editorView = new EditorView(elem, {
@@ -640,7 +660,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
       dispatchTransaction,
     });
 
-    setState({ editorView });
+    setState({ ...store, editorView });
     setTimeout(() => editorView.focus());
   };
 
@@ -673,6 +693,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
     store.editorView.focus();
   };
 
+  // 会返回编辑器状态与操作编辑器的方法
   const ctrl = {
     clean,
     discard,
@@ -693,7 +714,7 @@ export const createCtrl = (initial: State): [Store<State>, any] => {
     updateEditorState,
   };
 
-  return [store, ctrl];
+  return [store, ctrl] as const;
 };
 
 const createEditorState = (

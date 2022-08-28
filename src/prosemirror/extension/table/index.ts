@@ -54,7 +54,6 @@ const schema = {
     ...defaultSchema.table,
     selectable: true,
     draggable: true,
-    parseDOM: [{tag: 'div[data-type="table"]'}],
     toDOM: () => [
       'div',
       {
@@ -75,6 +74,7 @@ export default (): ProseMirrorExtension => ({
     keymap({
       'Ctrl-Enter': (state, dispatch) => {
         const cellPos = selectionCell(state)
+        if (!cellPos) return false
         const before = state.doc.resolve(cellPos.before())
         const targetPos = before.after()
         const tr = state.tr

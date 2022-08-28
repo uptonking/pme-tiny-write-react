@@ -7,7 +7,9 @@ import base from '../prosemirror/extension/base';
 import code from '../prosemirror/extension/code';
 import codeBlock from '../prosemirror/extension/code-block';
 import collab from '../prosemirror/extension/collab';
+import container from '../prosemirror/extension/container';
 import dragHandle from '../prosemirror/extension/drag-handle';
+import emphasis from '../prosemirror/extension/emphasis';
 import image from '../prosemirror/extension/image';
 import link from '../prosemirror/extension/link';
 import markdown from '../prosemirror/extension/markdown';
@@ -16,7 +18,6 @@ import placeholder from '../prosemirror/extension/placeholder';
 import position from '../prosemirror/extension/position';
 import scroll from '../prosemirror/extension/scroll';
 import select from '../prosemirror/extension/select';
-import strikethrough from '../prosemirror/extension/strikethrough';
 import table from '../prosemirror/extension/table';
 import todoList from '../prosemirror/extension/task-list';
 import { ProseMirrorExtension } from '../prosemirror/state';
@@ -72,10 +73,11 @@ export const createExtensions = (props: Props): ProseMirrorExtension[] =>
           extensions: () => [codeMirrorKeymap(props)],
         }),
         code(),
-        strikethrough(),
+        emphasis(),
         link(),
         table(),
         position(isDev),
+        container(),
         select({ background: selection(props.config) }),
         image(props.path),
         placeholder('Start typing ...'),

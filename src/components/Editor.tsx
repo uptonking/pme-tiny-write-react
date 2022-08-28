@@ -1,29 +1,45 @@
-import {onMount} from 'solid-js'
-import {css} from '@emotion/css'
-import {useState} from '../state'
-import {editorCss} from './Layout'
+import { useEffect, useRef } from 'react';
+
+import { css } from '@emotion/css';
+
+import { useGlobalContext } from '../context';
+import { editorCss } from './Layout';
+
+// import {onMount} from 'solid-js'
+// import {useState} from '../state'
 
 export default () => {
-  const [store, ctrl] = useState()
-  let editorRef: HTMLDivElement
+  // const [store, ctrl] = useState();
+  const store = useGlobalContext((v) => v.store);
+  const ctrl = useGlobalContext((v) => v.ctrl);
 
-  onMount(() => {
-    ctrl.createEditorView(editorRef)
-  })
+  let editorRef = useRef<HTMLDivElement>();
 
-  const styles = () => store.error ?
-    css`display: none` :
-    css`
-      ${editorCss(store.config)};
-      ${store.markdown ? 'white-space: pre-wrap' : ''};
-    `
+  // onMount(() => {
+  //   ctrl.createEditorView(editorRef)
+  // })
+  useEffect(() => {
+    if (editorRef.current) {
+      ctrl.createEditorView(editorRef.current);
+    }
+  }, []);
+
+  const styles = () =>
+    store.error
+      ? css`
+          display: none;
+        `
+      : css`
+          ${editorCss(store.config)};
+          ${store.markdown ? 'white-space: pre-wrap' : ''};
+        `;
 
   return (
     <div
       ref={editorRef}
-      class={styles()}
-      spellcheck={false}
-      data-tauri-drag-region="true"
+      className={styles()}
+      spellCheck={false}
+      data-tauri-drag-region='true'
     />
-  )
-}
+  );
+};

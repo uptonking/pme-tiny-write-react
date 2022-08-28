@@ -1,30 +1,37 @@
-import {splitProps} from 'solid-js'
-import {css} from '@emotion/css'
-import {background, foreground, primaryBackground, font, selection} from '../config'
-import {Config} from '../state'
+import { css } from '@emotion/css';
+
+import {
+  background,
+  font,
+  foreground,
+  primaryBackground,
+  selection,
+} from '../common/config';
+import { Config } from '../common/state';
 
 export type Styled = {
   children: any;
   config: Config;
   [key: string]: any;
-}
+};
 
 export const Layout = (props: Styled) => {
-  const [local, others] = splitProps(props, ['config', 'children'])
+  // const [local, others] = splitProps(props, ['config', 'children']);
+  const { config, children, ...others } = props;
   return (
     <div
       {...others}
-      class={css`
-        background: ${background(local.config)};
+      className={css`
+        background: ${background(config)};
         display: flex;
         width: 100%;
         height: 100%;
-        font-family: ${font(local.config)};
+        font-family: ${font(config)};
         font-size: 18px;
-        color: ${foreground(local.config)};
+        color: ${foreground(config)};
         position: relative;
         .drop-cursor {
-          background: ${primaryBackground(local.config)} !important;
+          background: ${primaryBackground(config)} !important;
           height: 2px !important;
           opacity: 0.5;
         }
@@ -49,7 +56,8 @@ export const Layout = (props: Styled) => {
             font-size: 12px;
             border-radius: 4px;
           }
-          &::before, &::after {
+          &::before,
+          &::after {
             content: '';
             transform: rotate(148deg);
             position: absolute;
@@ -61,7 +69,7 @@ export const Layout = (props: Styled) => {
           }
           &::before {
             transform: rotate(148deg);
-            left: 0
+            left: 0;
           }
           &::after {
             transform: rotate(-77deg);
@@ -70,9 +78,11 @@ export const Layout = (props: Styled) => {
           }
         }
       `}
-    >{local.children}</div>
-  )
-}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const editorCss = (config: Config) => css`
   height: 100%;
@@ -88,6 +98,8 @@ export const editorCss = (config: Config) => css`
     display: none;
   }
   > [contenteditable] {
+    word-wrap: break-word;
+    white-space: pre-wrap;
     position: relative;
     min-height: calc(100% - 100px);
     height: fit-content;
@@ -101,7 +113,12 @@ export const editorCss = (config: Config) => css`
     line-height: ${config.fontSize * 1.6}px;
     outline: none;
     background: transparent;
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       line-height: ${config.fontSize * 1.6}px;
     }
     h1 {
@@ -114,7 +131,9 @@ export const editorCss = (config: Config) => css`
     h3 {
       font-size: ${config.fontSize * 1.2}px;
     }
-    h4, h5, h6 {
+    h4,
+    h5,
+    h6 {
       font-size: ${config.fontSize}px;
     }
     p.truncate {
@@ -127,10 +146,12 @@ export const editorCss = (config: Config) => css`
       margin: 0;
       display: flow-root;
     }
-    > ul, ol {
+    > ul,
+    ol {
       padding: 0;
     }
-    > ul > li, > ol > li {
+    > ul > li,
+    > ol > li {
       margin-left: 30px;
     }
     blockquote {
@@ -158,7 +179,8 @@ export const editorCss = (config: Config) => css`
         border: 1px solid ${foreground(config)}7f;
         text-align: left;
         background: ${foreground(config)}19;
-        th, td {
+        th,
+        td {
           padding: 5px 10px;
           vertical-align: top;
           border: 1px solid ${foreground(config)}7f;
@@ -166,7 +188,8 @@ export const editorCss = (config: Config) => css`
           border-right: 0;
           position: relative;
         }
-        th:first-child, td:first-child {
+        th:first-child,
+        td:first-child {
           border-left: 0;
         }
         th {
@@ -312,7 +335,8 @@ export const editorCss = (config: Config) => css`
         }
         .cm-editor {
           outline: none;
-          .cm-content, .cm-gutter {
+          .cm-content,
+          .cm-gutter {
             padding: 0;
             font-family: '${font(config, true)}';
           }
@@ -414,6 +438,27 @@ export const editorCss = (config: Config) => css`
         opacity: 0.6;
       }
     }
+    .container-tip,
+    .container-warning,
+    .container-details {
+      padding: 40px;
+      border-radius: 3px;
+    }
+    .container-tip {
+      background: ${foreground(config)}19;
+    }
+    .container-details {
+      background: ${foreground(config)}19;
+      > summary {
+        cursor: pointer;
+      }
+      &[open] > summary {
+        margin-bottom: 10px;
+      }
+    }
+    .container-warning {
+      background: ${primaryBackground(config)}19;
+    }
     .image-container {
       position: relative;
       float: left;
@@ -434,7 +479,8 @@ export const editorCss = (config: Config) => css`
         right: -5px;
         cursor: nwse-resize;
       }
-      &.ProseMirror-selectednode, &.selected {
+      &.ProseMirror-selectednode,
+      &.selected {
         box-shadow: 0 0 0 2px ${primaryBackground(config)};
         border-radius: 3px;
       }
@@ -454,4 +500,4 @@ export const editorCss = (config: Config) => css`
     word-break: normal;
     pointer-events: none;
   }
-`
+`;

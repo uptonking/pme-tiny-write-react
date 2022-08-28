@@ -1,5 +1,5 @@
-import {Config} from './state'
 import {isDark} from './env'
+import {Config} from './state'
 
 interface Font {
   label: string;
