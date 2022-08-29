@@ -1,10 +1,11 @@
 import {inputRules} from 'prosemirror-inputrules'
+import {keymap} from 'prosemirror-keymap'
 import {Mark, MarkType} from 'prosemirror-model'
 import {EditorState, Transaction} from 'prosemirror-state'
 import {EditorView} from 'prosemirror-view'
-import {keymap} from 'prosemirror-keymap'
-import {markInputRule} from './mark-input-rule'
+
 import {ProseMirrorExtension} from '../state'
+import {markInputRule} from './mark-input-rule'
 
 const blank = '\xa0'
 

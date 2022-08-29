@@ -1,5 +1,5 @@
-import {Plugin, EditorState} from 'prosemirror-state'
 import {Schema, SchemaSpec} from 'prosemirror-model'
+import {EditorState, Plugin} from 'prosemirror-state'
 import {NodeViewConstructor} from 'prosemirror-view'
 
 export interface ProseMirrorExtension {

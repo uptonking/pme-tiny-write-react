@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { css } from '@emotion/css';
 
@@ -8,18 +8,19 @@ import { editorCss } from './Layout';
 // import {onMount} from 'solid-js'
 // import {useState} from '../state'
 
-export default () => {
+export const TinyEditor = () => {
   // const [store, ctrl] = useState();
   const store = useGlobalContext((v) => v.store);
   const ctrl = useGlobalContext((v) => v.ctrl);
 
-  let editorRef = useRef<HTMLDivElement>();
+  const editorRef = useRef<HTMLDivElement>();
 
   // onMount(() => {
   //   ctrl.createEditorView(editorRef)
   // })
   useEffect(() => {
     if (editorRef.current) {
+      console.log(';; ctrl.initEditorView() ');
       ctrl.createEditorView(editorRef.current);
     }
   }, []);

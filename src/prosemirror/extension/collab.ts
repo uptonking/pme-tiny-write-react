@@ -1,9 +1,15 @@
 import {Plugin} from 'prosemirror-state'
 import {EditorView} from 'prosemirror-view'
-import {ySyncPlugin, yCursorPlugin, yUndoPlugin, ySyncPluginKey} from 'y-prosemirror'
-import {Awareness} from 'y-protocols/awareness'
-import {ProseMirrorExtension} from '../state'
-import {YOptions} from '../../state'
+import {
+  yCursorPlugin,
+  ySyncPlugin,
+  ySyncPluginKey,
+  yUndoPlugin,
+} from 'y-prosemirror';
+import { Awareness } from 'y-protocols/awareness';
+
+import { YOptions } from '../../common/state';
+import { ProseMirrorExtension } from '../state';
 
 const cursorBuilder = (user: any): HTMLElement => {
   const cursor = document.createElement('span')
@@ -87,12 +93,16 @@ const yMouseCursorPlugin = (awareness: Awareness) => new Plugin({
 })
 
 export default (y?: YOptions): ProseMirrorExtension => ({
-  plugins: (prev) => y ? [
-    ...prev,
-    ySyncPlugin(y.prosemirrorType),
-    // @ts-ignore
-    yCursorPlugin(y.provider.awareness, {cursorBuilder}),
-    yMouseCursorPlugin(y.provider.awareness),
-    yUndoPlugin(),
-  ] : prev
-})
+  plugins: (prev) =>
+    y
+      ? [
+          ...prev,
+          ySyncPlugin(y.prosemirrorType),
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          yCursorPlugin(y.provider.awareness, { cursorBuilder }),
+          yMouseCursorPlugin(y.provider.awareness),
+          yUndoPlugin(),
+        ]
+      : prev,
+});

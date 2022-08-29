@@ -1,17 +1,17 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { css, injectGlobal } from '@emotion/css';
 
-import Editor from '../components/Editor';
-import ErrorView from '../components/Error';
+import { TinyEditor } from '../components/Editor';
 import { Layout } from '../components/Layout';
-import Menu from '../components/Menu';
 import { useGlobalContext } from '../context';
 import { insertImage } from '../prosemirror/extension/image';
 import { useEffectOnce } from '../utils/hooks/use-effect-once';
 import { fonts } from './config';
 import { isTauri } from './env';
 
+// import ErrorView from '../components/Error';
+// import Menu from '../components/Menu';
 // import { State, StateContext } from './state';
 // import { createCtrl } from './ctrl';
 // import * as remote from './remote';
@@ -61,13 +61,13 @@ export const MainApp = () => {
   //   await ctrl.init();
   // });
   useEffect(() => {
-    const initEditor = async () => {
+    const initEditorState = async () => {
       if (store.error) return;
       await ctrl.init();
-      console.log(';; 初始化编辑器完成 ');
+      console.log(';; ctrl.init() ');
     };
-    initEditor();
-  });
+    initEditorState();
+  }, []);
 
   // onMount(() => {
   //   const matchDark = () => window.matchMedia('(prefers-color-scheme: dark)');
@@ -195,9 +195,8 @@ export const MainApp = () => {
       {store.error ? <h4>ERROR 异常组件</h4> : null}
       {store.loading === 'initialized' ? (
         <>
-          {!store.error ? <Editor /> : null}
+          {!store.error ? <TinyEditor /> : null}
           {/* <Menu /> */}
-
           <div
             className={css`
               position: relative;

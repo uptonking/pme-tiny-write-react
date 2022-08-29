@@ -178,13 +178,13 @@ export const createMarkdownParser = (schema: Schema) =>
     ordered_list: {
       block: 'ordered_list',
       getAttrs: (tok, tokens, i) => ({
-        order: +tok.attrGet('start') || 1,
+        order: Number(tok.attrGet('start')) || 1,
         tight: listIsTight(tokens, i),
       }),
     },
     heading: {
       block: 'heading',
-      getAttrs: (tok) => ({ level: +tok.tag.slice(1) }),
+      getAttrs: (tok) => ({ level: Number(tok.tag.slice(1)) }),
     },
     code_block: {
       block: 'code_block',

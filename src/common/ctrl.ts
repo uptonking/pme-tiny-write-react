@@ -26,7 +26,14 @@ import { isDarkTheme, themes } from './config';
 import { COLLAB_URL, isTauri, mod } from './env';
 import { createMarkdownParser, serialize } from './markdown';
 import { createEmptyText, createExtensions, createSchema } from './prosemirror';
-import { Collab, Config, File, ServiceError, State, newState } from './state';
+import {
+  Collab,
+  Config,
+  File,
+  ServiceError,
+  State,
+  getInitialState,
+} from './state';
 
 // import * as remote from './remote';
 // import { Store, createStore, unwrap } from 'solid-js/store';
@@ -48,7 +55,10 @@ const isConfig = (x: any): boolean =>
 export const useCreateCtrlEditor = (initial: State) => {
   // 会返回这个store
   const [store, setState] = useState(initial);
-  const initialEditorState = { text: undefined, extensions: undefined };
+  const [initialEditorState, setInitialEditorState] = useState({
+    text: undefined,
+    extensions: undefined,
+  });
 
   const onReload = () => {
     if (!isTauri) return;
@@ -254,7 +264,7 @@ export const useCreateCtrlEditor = (initial: State) => {
   const clean = () => {
     // disconnectCollab(unwrap(store.collab));
     const state: State = {
-      ...newState(),
+      ...getInitialState(),
       args: { cwd: store.args?.cwd },
       loading: 'initialized',
       files: [],
@@ -295,9 +305,12 @@ export const useCreateCtrlEditor = (initial: State) => {
     }
   };
 
+  /** 💡 初始化会从indexeddb读取数据  */
   const init = async () => {
     try {
       const result = await fetchData();
+      console.log(';; init-fetch ', result);
+
       let data = result[0];
       let text = result[1];
       const ydoc = result[2];
@@ -642,7 +655,7 @@ export const useCreateCtrlEditor = (initial: State) => {
     // setState('config', getTheme(unwrap(store), true));
   };
 
-  /** 创建pme-EditorView对象 */
+  /** 💡 创建pme-EditorView 实际执行 */
   const createEditorView = (elem: HTMLElement) => {
     const { text, extensions } = initialEditorState;
     const { editorState, nodeViews } = createEditorState(text, extensions);
@@ -664,6 +677,7 @@ export const useCreateCtrlEditor = (initial: State) => {
     setTimeout(() => editorView.focus());
   };
 
+  /** 更新原理是通过 EditorState.fromJSON 重新创建 */
   const updateEditorState = (state: State, text?: ProseMirrorState) => {
     const extensions = createExtensions({
       config: state.config ?? store.config,
@@ -675,12 +689,14 @@ export const useCreateCtrlEditor = (initial: State) => {
 
     // Save text and extensions for first render
     if (!state.editorView) {
-      initialEditorState.text = text;
-      initialEditorState.extensions = extensions;
+      // initialEditorState.text = text;
+      // initialEditorState.extensions = extensions;
+      setInitialEditorState({ text, extensions });
       return;
     } else {
-      delete initialEditorState.text;
-      delete initialEditorState.extensions;
+      // delete initialEditorState.text;
+      // delete initialEditorState.extensions;
+      setInitialEditorState({ text: undefined, extensions: undefined });
     }
 
     const t = text ?? store.editorView.state;
@@ -715,8 +731,9 @@ export const useCreateCtrlEditor = (initial: State) => {
   };
 
   return [store, ctrl] as const;
-};
+};;
 
+/** 💡 创建 pme-EditorState 实际执行 */
 const createEditorState = (
   text: ProseMirrorState,
   extensions: ProseMirrorExtension[],

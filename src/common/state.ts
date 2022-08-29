@@ -86,7 +86,7 @@ export class ServiceError extends Error {
 // ]);
 // export const useState = () => useContext(StateContext);
 
-export const newState = (props: Partial<State> = {}): State => ({
+export const getInitialState = (props: Partial<State> = {}): State => ({
   files: [],
   loading: 'loading',
   fullscreen: false,
@@ -95,7 +95,7 @@ export const newState = (props: Partial<State> = {}): State => ({
     fontSize: 24,
     contentWidth: 800,
     alwaysOnTop: false,
-    typewriterMode: true,
+    typewriterMode: false,
     prettier: {
       printWidth: 80,
       tabWidth: 2,

@@ -1,12 +1,13 @@
 import {
+  ellipsis,
+  emDash,
   inputRules,
+  smartQuotes,
   textblockTypeInputRule,
   wrappingInputRule,
-  smartQuotes,
-  emDash,
-  ellipsis,
-} from 'prosemirror-inputrules'
+} from 'prosemirror-inputrules';
 import {NodeType, Schema} from 'prosemirror-model'
+
 import {ProseMirrorExtension} from '../state'
 
 const blockQuoteRule = (nodeType: NodeType) =>
@@ -16,9 +17,9 @@ const orderedListRule = (nodeType: NodeType) =>
   wrappingInputRule(
     /^(\d+)\.\s$/,
     nodeType,
-    match => ({order: +match[1]}),
-    (match, node) => node.childCount + node.attrs.order == +match[1]
-  )
+    (match) => ({ order: Number(match[1]) }),
+    (match, node) => node.childCount + node.attrs.order == Number(match[1]),
+  );
 
 const bulletListRule = (nodeType: NodeType) =>
   wrappingInputRule(/^\s*([-+*])\s$/, nodeType)

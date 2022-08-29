@@ -1,12 +1,17 @@
-import { version } from '../../package.json';
+// import { version } from '../../package.json';
+
+const version = '0.6.0';
 
 export const isTauri = (window as any).__TAURI__ !== undefined;
 
 export const isDark = () =>
   (window as any).matchMedia('(prefers-color-scheme: dark)').matches;
 
-export const isTest = import.meta.env.NODE_ENV === 'test';
-export const isDev = import.meta.env.DEV;
+// export const isTest = import.meta.env.NODE_ENV === 'test';
+// export const isDev = import.meta.env.DEV;
+
+export const isTest = false;
+export const isDev = true;
 
 export const isMac =
   window.process?.platform === 'darwin' ||

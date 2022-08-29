@@ -1,6 +1,7 @@
+import {Mark, Node, Schema} from 'prosemirror-model'
 import {Plugin, PluginKey, TextSelection, Transaction} from 'prosemirror-state'
 import {EditorView} from 'prosemirror-view'
-import {Mark, Node, Schema} from 'prosemirror-model'
+
 import {ProseMirrorExtension} from '../state'
 
 const REGEX = /(^|\s)\[(.+)\]\(([^ ]+)(?: "(.+)")?\)/
@@ -26,7 +27,7 @@ const markdownLinks = (schema: Schema) => new Plugin({
       return {schema, pos: undefined}
     },
     apply(tr, state) {
-      const action = tr.getMeta(this)
+      const action = tr.getMeta(this as any)
       if (action?.pos) {
         state.pos = action.pos
       }

@@ -5,7 +5,6 @@ import { keymap as cmKeymap } from '@codemirror/view';
 
 import base from '../prosemirror/extension/base';
 import code from '../prosemirror/extension/code';
-import codeBlock from '../prosemirror/extension/code-block';
 import collab from '../prosemirror/extension/collab';
 import container from '../prosemirror/extension/container';
 import dragHandle from '../prosemirror/extension/drag-handle';
@@ -24,6 +23,8 @@ import { ProseMirrorExtension } from '../prosemirror/state';
 import { codeTheme, font, isDarkTheme, selection } from './config';
 import { isDev } from './env';
 import { Config, YOptions } from './state';
+
+// import codeBlock from '../prosemirror/extension/code-block';
 
 interface Props {
   data?: unknown;
@@ -63,15 +64,15 @@ export const createExtensions = (props: Props): ProseMirrorExtension[] =>
         markdown(),
         todoList(),
         dragHandle(),
-        codeBlock({
-          theme: codeTheme(props.config),
-          dark: isDarkTheme(props.config),
-          typewriterMode: props.config.typewriterMode,
-          fontSize: props.config.fontSize,
-          font: font(props.config, true),
-          prettier: props.config.prettier,
-          extensions: () => [codeMirrorKeymap(props)],
-        }),
+        // codeBlock({
+        //   theme: codeTheme(props.config),
+        //   dark: isDarkTheme(props.config),
+        //   typewriterMode: props.config.typewriterMode,
+        //   fontSize: props.config.fontSize,
+        //   font: font(props.config, true),
+        //   prettier: props.config.prettier,
+        //   extensions: () => [codeMirrorKeymap(props)],
+        // }),
         code(),
         emphasis(),
         link(),

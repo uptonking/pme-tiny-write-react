@@ -1,5 +1,6 @@
 import {Plugin} from 'prosemirror-state'
 import {EditorView} from 'prosemirror-view'
+
 import {ProseMirrorExtension} from '../state'
 
 const scroll = (view: EditorView) => {
