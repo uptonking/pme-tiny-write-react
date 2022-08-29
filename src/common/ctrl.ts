@@ -1,6 +1,7 @@
 import * as db from 'idb-keyval';
 import { fromUint8Array, toUint8Array } from 'js-base64';
 import { deleteSelection, selectAll } from 'prosemirror-commands';
+import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { redo, undo } from 'prosemirror-history';
 import { Schema } from 'prosemirror-model';
 import { EditorState, Transaction } from 'prosemirror-state';
@@ -50,8 +51,7 @@ const isConfig = (x: any): boolean =>
   (typeof x.codeTheme === 'string' || x.codeTheme === undefined) &&
   (typeof x.font === 'string' || x.font === undefined);
 
-/** 创建并返回全局状态、初始化编辑器、返回操作编辑器的方法 */
-// export const createCtrl = (initial: State): [Store<State>, any] => {
+/** 创建并返回全局状态、返回初始化编辑器、操作编辑器的方法 */
 export const useCreateCtrlEditor = (initial: State) => {
   // 会返回这个store
   const [store, setState] = useState(initial);
@@ -121,7 +121,8 @@ export const useCreateCtrlEditor = (initial: State) => {
   };
 
   const addToFiles = (files: File[], prev: State, prevYdoc?: Uint8Array) => {
-    let text, ydoc;
+    let text;
+    let ydoc;
     if (prevYdoc || prev.collab?.room) {
       ydoc = prevYdoc ?? Y.encodeStateAsUpdate(prev.collab.y.provider.doc);
     } else {
@@ -187,7 +188,7 @@ export const useCreateCtrlEditor = (initial: State) => {
       args = { room: room ? room : undefined };
     }
     const data = await db.get('state');
-    console.log(';; 读取数据 ', data);
+    console.log(';; 读取idb数据 ', data);
 
     let parsed: any;
     if (data !== undefined) {
@@ -659,19 +660,23 @@ export const useCreateCtrlEditor = (initial: State) => {
   const createEditorView = (elem: HTMLElement) => {
     const { text, extensions } = initialEditorState;
     const { editorState, nodeViews } = createEditorState(text, extensions);
+
+    let editorView: EditorView | undefined;
     const dispatchTransaction = (tr: Transaction) => {
-      if (!store.editorView) return;
-      const newState = store.editorView.state.apply(tr);
-      store.editorView.updateState(newState);
+      // console.log(';; tr ', editorView, tr);
+      if (!editorView) return;
+      const newState = editorView.state.apply(tr);
+      editorView.updateState(newState);
       if (!tr.docChanged) return;
       setState({ ...store, lastModified: new Date() });
     };
 
-    const editorView = new EditorView(elem, {
+    editorView = new EditorView(elem, {
       state: editorState,
       nodeViews,
       dispatchTransaction,
     });
+    applyDevTools(editorView);
 
     setState({ ...store, editorView });
     setTimeout(() => editorView.focus());
@@ -709,7 +714,7 @@ export const useCreateCtrlEditor = (initial: State) => {
     store.editorView.focus();
   };
 
-  // 会返回编辑器状态与操作编辑器的方法
+  /** 会返回编辑器状态与操作编辑器的方法 */
   const ctrl = {
     clean,
     discard,
@@ -731,7 +736,7 @@ export const useCreateCtrlEditor = (initial: State) => {
   };
 
   return [store, ctrl] as const;
-};;
+};
 
 /** 💡 创建 pme-EditorState 实际执行 */
 const createEditorState = (

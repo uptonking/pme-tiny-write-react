@@ -20,10 +20,11 @@ export const TinyEditor = () => {
   // })
   useEffect(() => {
     if (editorRef.current) {
-      console.log(';; ctrl.initEditorView() ');
+      // console.log(';; ctrl.initEditorView1 ');
       ctrl.createEditorView(editorRef.current);
     }
   }, []);
+  // console.log(';; ctrl.initEditorView2 ', store.editorView);
 
   const styles = () =>
     store.error

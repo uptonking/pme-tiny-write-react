@@ -60,7 +60,10 @@ export const MainApp = () => {
   //   if (store.error) return;
   //   await ctrl.init();
   // });
+  // console.log(';; Main-render');
   useEffect(() => {
+    // console.log(';; Main-effect');
+
     const initEditorState = async () => {
       if (store.error) return;
       await ctrl.init();
@@ -206,7 +209,7 @@ export const MainApp = () => {
               font-family: 'JetBrains Mono ExtraLight';
             `}
           >
-            <h4>Menu 菜单组件</h4>
+            <h6>Menu 菜单组件</h6>
           </div>
         </>
       ) : null}
