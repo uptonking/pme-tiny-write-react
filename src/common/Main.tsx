@@ -29,7 +29,7 @@ const fontsStyles = Object.entries(fonts)
     },
   }));
 
-injectGlobal(fontsStyles);
+// injectGlobal(fontsStyles);
 
 // export const MainApp = (props: { state: State }) => {
 export const MainApp = () => {

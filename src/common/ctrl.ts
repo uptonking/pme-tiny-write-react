@@ -51,7 +51,10 @@ const isConfig = (x: any): boolean =>
   (typeof x.codeTheme === 'string' || x.codeTheme === undefined) &&
   (typeof x.font === 'string' || x.font === undefined);
 
-/** 创建并返回全局状态、返回初始化编辑器、操作编辑器的方法 */
+/** 💡 创建并返回全局状态、返回初始化编辑器、操作编辑器的方法
+ * - init()创建editorState
+ * - createEditorView()创建editorView
+ */
 export const useCreateCtrlEditor = (initial: State) => {
   // 会返回这个store
   const [store, setState] = useState(initial);
@@ -310,6 +313,7 @@ export const useCreateCtrlEditor = (initial: State) => {
   const init = async () => {
     try {
       const result = await fetchData();
+      // 本地开发时返回数组只有第一个有值
       console.log(';; init-fetch ', result);
 
       let data = result[0];
@@ -351,7 +355,7 @@ export const useCreateCtrlEditor = (initial: State) => {
   const loadFile = async (config: Config, path: string): Promise<File> => {
     try {
       // const fileContent = await remote.readFile(path);
-      const fileContent = 'test markdown 内容';
+      const fileContent = '## test markdown 内容';
       // const lastModified = await remote.getFileLastModified(path);
       const lastModified = new Date();
       const schema = createSchema({
@@ -662,6 +666,7 @@ export const useCreateCtrlEditor = (initial: State) => {
     const { editorState, nodeViews } = createEditorState(text, extensions);
 
     let editorView: EditorView | undefined;
+
     const dispatchTransaction = (tr: Transaction) => {
       // console.log(';; tr ', editorView, tr);
       if (!editorView) return;
@@ -676,7 +681,7 @@ export const useCreateCtrlEditor = (initial: State) => {
       nodeViews,
       dispatchTransaction,
     });
-    applyDevTools(editorView);
+    applyDevTools(editorView, { devToolsExpanded: true });
 
     setState({ ...store, editorView });
     setTimeout(() => editorView.focus());
@@ -691,19 +696,22 @@ export const useCreateCtrlEditor = (initial: State) => {
       keymap,
       ...(state.collab?.y?.prosemirrorType ? { y: state.collab.y } : {}),
     });
-
     // Save text and extensions for first render
     if (!state.editorView) {
       // initialEditorState.text = text;
       // initialEditorState.extensions = extensions;
       setInitialEditorState({ text, extensions });
+      // 👉🏻 首次初始化时editorState对象并没有创建，而是在createEditorView中创建
       return;
     } else {
       // delete initialEditorState.text;
       // delete initialEditorState.extensions;
-      setInitialEditorState({ text: undefined, extensions: undefined });
+      setInitialEditorState({
+        ...initialEditorState,
+        text: undefined,
+        extensions: undefined,
+      });
     }
-
     const t = text ?? store.editorView.state;
     const { editorState, nodeViews } = createEditorState(
       t,
@@ -738,7 +746,9 @@ export const useCreateCtrlEditor = (initial: State) => {
   return [store, ctrl] as const;
 };
 
-/** 💡 创建 pme-EditorState 实际执行 */
+/** 💡 创建 pme-EditorState 实际执行，基于`EditorState.fromJSON`实现
+ * - 会从extensions中收集 schema、nodeViews、plugins
+ */
 const createEditorState = (
   text: ProseMirrorState,
   extensions: ProseMirrorExtension[],
@@ -751,6 +761,7 @@ const createEditorState = (
   let schemaSpec = { nodes: {} };
   let nodeViews = {};
   let plugins = [];
+  console.log(';; createEdiState-reconfigure ', reconfigure);
 
   for (const extension of extensions) {
     if (extension.schema) {
@@ -775,6 +786,7 @@ const createEditorState = (
   } else if (text instanceof EditorState) {
     editorState = EditorState.fromJSON({ schema, plugins }, text.toJSON());
   } else {
+    // 首次初始化编辑器时执行这里
     editorState = EditorState.fromJSON({ schema, plugins }, text);
   }
 

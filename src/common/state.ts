@@ -51,6 +51,7 @@ export type LoadingType = 'loading' | 'initialized';
 
 export interface State {
   editorView?: any;
+  /** if true, show plain md text; if false, show instant md preview   */
   markdown?: boolean;
   lastModified?: Date;
   files: File[];

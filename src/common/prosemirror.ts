@@ -87,6 +87,7 @@ export const createExtensions = (props: Props): ProseMirrorExtension[] =>
         collab(props.y),
       ];
 
+/** 返回符合PMEditorState的对象字面量 */
 export const createEmptyText = () => ({
   doc: {
     type: 'doc',
